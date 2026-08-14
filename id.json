@@ -1,0 +1,19 @@
+{
+  "iframes": [
+    {
+      "id": "ind-aus",
+      "iframeSrc": "https://stream.example.com/india-vs-australia",
+      "hit": "https://track.example.com/view"
+    },
+    {
+      "id": "eng-pak",
+      "iframeSrc": "https://stream.example.com/england-vs-pakistan",
+      "hit": "https://track.example.com/view"
+    },
+    {
+      "id": "nz-sa",
+      "iframeSrc": "https://stream.example.com/newzealand-vs-southafrica",
+      "hit": "https://track.example.com/view"
+    }
+  ]
+}
