@@ -453,10 +453,9 @@
         <a href="https://t.me/MSD_cricketlinks" target="_blank" rel="noopener noreferrer" class="popup-button join-btn">Join Channel Now</a>
         <button class="popup-button joined-btn" onclick="document.getElementById('telegramPopup').style.display='none';">I've Already Joined</button>
     </div>
-
-    <!-- Custom Popup Overlay --
-    <script>
-        const promoHTML = `
+    
+    </script>
+         const promoHTML = `
         <a href="https://t.me/MSD_cricketlinks" target="_blank" rel="noopener noreferrer" class="promo-card">
             <div class="promo-text-area">
                 <div class="promo-title">MSD Cricket Links</div>
@@ -464,7 +463,7 @@
             </div>
         </a>
         `;
-
+    
         async function initializeApp() {
             try {
                 const response = await fetch('https://allrounder2-0.pages.dev/id.json');
