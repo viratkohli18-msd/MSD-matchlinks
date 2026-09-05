@@ -1,0 +1,328 @@
+{
+  "iframes": [
+    {
+      "id": "hindi",
+      "name": "Star Sports Hindi",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder3-0.pages.dev/cricket/sony-3"
+    },
+    {
+      "id": "sony-liv",
+      "name": "Sony Liv",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder3-0.pages.dev/sony-2"
+    },
+    {
+      "id": "mirzapur",
+      "name": "Mirzapur",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder3-0.pages.dev/mirzapur"
+    },
+    {
+      "id": "ios-3",
+      "name": "iOS",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-live12.pages.dev/ios-3"
+    },
+    {
+      "id": "hindi2",
+      "name": "Star Sports Hindi",
+      "type": "iframe",
+      "iframeSrc": "https://allrounderlive.in/hindi2"
+    },
+    {
+      "id": "pl2",
+      "name": "6ter",
+      "type": "iframe",
+      "iframeSrc": "https://fifa-world-cup-live.pages.dev/6ter"
+    },
+    {
+      "id": "fussball",
+      "name": "6ter",
+      "type": "iframe",
+      "iframeSrc": "https://fifa-world-cup-live.pages.dev/fussball"
+    },
+    {
+      "id": "w9",
+      "name": "6ter",
+      "type": "iframe",
+      "iframeSrc": "https://fifa-world-cup-live.pages.dev/w9"
+    },
+    {
+      "id": "gulli",
+      "name": "6ter",
+      "type": "iframe",
+      "iframeSrc": "https://fifa-world-cup-live.pages.dev/guli"
+    },
+    {
+      "id": "pl1",
+      "name": "6ter",
+      "type": "iframe",
+      "iframeSrc": "https://fifa-world-cup-live.pages.dev/m6"
+    },
+    {
+      "id": "lg1",
+      "name": "6ter",
+      "type": "iframe",
+      "iframeSrc": "https://fifa-world-cup-live.pages.dev/lg1"
+    },
+    {
+      "id": "lg2",
+      "name": "6ter",
+      "type": "iframe",
+      "iframeSrc": "https://fifa-world-cup-live.pages.dev/lg2"
+    },
+    {
+      "id": "lg3",
+      "name": "6ter",
+      "type": "iframe",
+      "iframeSrc": "https://fifa-world-cup-live.pages.dev/lg3"
+    },
+    {
+      "id": "pl5",
+      "name": "Zee Hindi",
+      "type": "iframe",
+      "iframeSrc": "https://fifa-world-cup-live.pages.dev/hindi.html"
+    },
+    {
+      "id": "pl3",
+      "name": "FIFA",
+      "type": "iframe",
+      "iframeSrc": "https://fifa-world-cup-live.pages.dev/fifa1"
+    },
+    {
+      "id": "pl4",
+      "name": "Zee English",
+      "type": "iframe",
+      "iframeSrc": "https://fifa-world-cup-live.pages.dev/english"
+    },
+    {
+      "id": "ios-2",
+      "name": "iOS",
+      "type": "iframe",
+      "iframeSrc": "https://fifa-world-cup-live.pages.dev/ios.html"
+    },
+    {
+      "id": "tsn",
+      "name": "TSN",
+      "type": "iframe",
+      "iframeSrc": "https://fifa-world-cup-live.pages.dev/tsn"
+    },
+    {
+      "id": "kayo",
+      "name": "Cricbuzz",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-live12.pages.dev/channel/kayo"
+    },
+    {
+      "id": "kayo2",
+      "name": "Cricbuzz",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-live12.pages.dev/channel/kayo-2"
+    },
+    {
+      "id": "ptv",
+      "name": "Star Sports Hindi",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-live2.pages.dev/channel/ptv"
+    },
+    {
+      "id": "myco",
+      "name": "Myco",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-rho.vercel.app/channel/myco.html"
+    },
+    {
+      "id": "prime-hin",
+      "name": "Prime Hindi",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-live.pages.dev/channel/prame-hin.html"
+    },
+    {
+      "id": "wpl",
+      "name": "Hotstar",
+      "type": "iframe",
+      "iframeSrc": "https://allrounderlive.pages.dev/cric-life"
+    },
+    {
+      "id": "hub",
+      "name": "Hub",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-live.pages.dev/channel/hub5"
+    },
+    {
+      "id": "tnt",
+      "name": "TNT Sports",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder3-0.pages.dev/cricket/tnt"
+    },
+    {
+      "id": "fancode",
+      "name": "Fancode",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder3-0.pages.dev/cricket/fancode"
+    },
+    {
+      "id": "asiacup",
+      "name": "Asia Cup",
+      "type": "iframe",
+      "iframeSrc": "https://allrounderlive.pages.dev/player?url=https://d3ssd0juqbxbw.cloudfront.net/mtvsinstlive/master.m3u8"
+    },
+    {
+      "id": "willow",
+      "name": "Willow",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder3-0.pages.dev/cricket/willow"
+    },
+    {
+      "id": "willow-2",
+      "name": "Willow",
+      "type": "iframe",
+      "iframeSrc": "https://allrounderlive.pages.dev/willow2"
+    },
+    {
+      "id": "prame-hin",
+      "name": "Prime Hindi",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-live.pages.dev/channel/prame-hin.html"
+    },
+    {
+      "id": "alt",
+      "name": "DILLZY",
+      "type": "iframe",
+      "iframeSrc": "https://allrounderlive.pages.dev/player?url=https://dillzy.cricketstream745.workers.dev/live.m3u8"
+    },
+    {
+      "id": "prime-eng",
+      "name": "Prime English",
+      "type": "iframe",
+      "iframeSrc": "https://allrounderlive.in/prime.html"
+    },
+    {
+      "id": "sky-sports-nz",
+      "name": "Sky NZ",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-live12.pages.dev/channel/hub5"
+    },
+    {
+      "id": "willow-sports",
+      "name": "Willow",
+      "type": "iframe",
+      "iframeSrc": "https://cricketstan.github.io/Willow-Sports/"
+    },
+    {
+      "id": "hotstar",
+      "name": "Hotstar",
+      "type": "iframe",
+      "iframeSrc": "https://allrounderlive.pages.dev/dilz?id=dillzy645"
+    },
+    {
+      "id": "fox",
+      "name": "Fox Cricket 501",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-live12.pages.dev/channel/fox1"
+    },
+    {
+      "id": "channel-7",
+      "name": "7 Plus Cricket",
+      "type": "iframe",
+      "iframeSrc": "https://allrounderlive.pages.dev/player?url=https://hugh.cdn.rumble.cloud/live/gi29le7p/slot-139/bx1o-9vac_720p/chunklist.m3u8"
+    },
+    {
+      "id": "ios",
+      "name": "Apple Wale",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-live12.pages.dev/hotstar"
+    },
+    {
+      "id": "eng",
+      "name": "Star Sports Select",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder3-0.pages.dev/eng"
+    },
+    {
+      "id": "fox-hd",
+      "name": "Fox Cricket",
+      "type": "iframe",
+      "iframeSrc": "https://cricketstan.github.io/Fox-Cricket-/"
+    },
+    {
+      "id": "zee",
+      "name": "Zee Cinema",
+      "type": "iframe",
+      "iframeSrc": "https://zee-seven.vercel.app/"
+    },
+    {
+      "id": "jio-hotstar",
+      "name": "Jio Hotstar",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-live7.pages.dev/channel/hotstar"
+    },
+    {
+      "id": "sky-uk",
+      "name": "SKY",
+      "type": "iframe",
+      "iframeSrc": "https://allroundersd.pages.dev/channel/sky-uk"
+    },
+    {
+      "id": "sky-nz-1",
+      "name": "SKY NZ",
+      "type": "iframe",
+      "iframeSrc": "https://crickettv.site/sky-nz/player?id=3"
+    },
+    {
+      "id": "tnt-1",
+      "name": "TNT Sports 1",
+      "type": "iframe",
+      "iframeSrc": "https://cricketstan.github.io/TNT-1/"
+    },
+    {
+      "id": "prime-nz",
+      "name": "PRIME",
+      "type": "iframe",
+      "iframeSrc": "https://hff-cricketstan.wasmer.app/"
+    },
+    {
+      "id": "sony",
+      "name": "SONY",
+      "type": "iframe",
+      "iframeSrc": "https://allrounderlive.pages.dev/sonyliv/sonyliv-1"
+    },
+    {
+      "id": "sony-3",
+      "name": "SONY",
+      "type": "iframe",
+      "iframeSrc": "https://cricketstan.github.io/Sony-ten-5/"
+    },
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "type": "iframe",
+      "iframeSrc": "https://www.youtube.com/embed/wnlfD625Eqo?autoplay=1"
+    },
+    {
+      "id": "cricbuzz",
+      "name": "Cricbuzz",
+      "type": "iframe",
+      "iframeSrc": "https://allroundersd.pages.dev/cricbuzz1.html"
+    },
+    {
+      "id": "telugu",
+      "name": "Star Telugu",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-live4.pages.dev/star/telugu"
+    },
+    {
+      "id": "fncode",
+      "name": "Fancode",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-live4.pages.dev/fancode-player?url=https://in-mc-flive.fancode.com/mumbai/141407_english_hls_ab5ff6c24a21542_1ta-di_h264/1080p.m3u8?hdntl=Expires=1773474245~_GO=Generated~acl=/mumbai/141407_english_hls_ab5ff6c24a21542_1ta-di_h264/*~Signature=AR77L-Yyr9Cdj5X_0so3HpmxTUDWXrASgqUxhTGBOrJaU6SPgB5oUrj5FOVZ7FqeaDZnyCZIHYhGDYKbrr-wcsI214oJ"
+    },
+    {
+      "id": "tamil",
+      "name": "Tamil",
+      "type": "iframe",
+      "iframeSrc": "https://allrounder-live4.pages.dev/star/tamil-1"
+    }
+  ]
+}
