@@ -1,1083 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>JioTV Player — MSD7</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player</title>
 <style>
-:root{
-  --bg:#0a0a0f;--bg-elev:#12121a;--bg-hover:#1a1a24;--bg-active:#24243a;
-  --border:#2a2a3a;--text:#e8e8f0;--text-dim:#8888a0;--text-muted:#5a5a70;
-  --accent:#6a5acd;--accent-hover:#7a6add;--danger:#e74c3c;--success:#2ecc71;
-  --warning:#f39c12;--radius:8px;--sidebar-w:320px;
-}
-*,*::before,*::after{box-sizing:border-box}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-  font-size:14px;overflow:hidden;-webkit-font-smoothing:antialiased}
-button{font-family:inherit;font-size:inherit;color:inherit;background:none;
-  border:none;cursor:pointer;padding:0}
-input{font-family:inherit;font-size:inherit}
-
-.app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;height:100vh;width:100vw}
-@media(max-width:768px){.app{grid-template-columns:1fr}
-.sidebar{display:none}.sidebar.open{display:flex;position:fixed;inset:0 auto 0 0;
-  width:280px;z-index:100}}
-
-.sidebar{display:flex;flex-direction:column;background:var(--bg-elev);
-  border-right:1px solid var(--border);overflow:hidden;min-width:0}
-.sidebar-header{padding:14px;border-bottom:1px solid var(--border);
-  display:flex;flex-direction:column;gap:10px}
-.sidebar-title{display:flex;align-items:center;justify-content:space-between}
-.sidebar-title h1{font-size:14px;font-weight:600;margin:0}
-.badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;
-  height:20px;padding:0 6px;border-radius:10px;background:var(--bg-active);
-  color:var(--text-dim);font-size:11px;font-weight:600}
-.search-input{width:100%;height:34px;padding:0 12px;background:var(--bg);
-  border:1px solid var(--border);border-radius:var(--radius);color:var(--text);
-  outline:none}
-.search-input:focus{border-color:var(--accent)}
-.search-input::placeholder{color:var(--text-muted)}
-
-.channel-list{flex:1;overflow-y:auto;padding:8px;display:flex;
-  flex-direction:column;gap:4px}
-.channel-list::-webkit-scrollbar{width:6px}
-.channel-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-.channel-item{display:flex;align-items:center;gap:10px;padding:8px 10px;
-  border-radius:var(--radius);border:1px solid transparent;color:var(--text);
-  text-align:left;cursor:pointer;transition:background .15s;width:100%}
-.channel-item:hover{background:var(--bg-hover)}
-.channel-item.active{background:var(--bg-active);border-color:var(--accent)}
-.ch-logo{width:36px;height:36px;border-radius:6px;background:var(--bg-active);
-  object-fit:contain;flex-shrink:0}
-.ch-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.ch-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;
-  text-overflow:ellipsis}
-.ch-meta{font-size:10px;color:var(--text-muted);white-space:nowrap;
-  overflow:hidden;text-overflow:ellipsis}
-.ch-status{width:8px;height:8px;border-radius:50%;background:var(--text-muted);
-  flex-shrink:0}
-.ch-status.ok{background:var(--success)}
-.ch-status.fail{background:var(--danger)}
-.ch-status.testing{background:var(--warning);animation:pulse 1s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-.sidebar-footer{padding:10px;border-top:1px solid var(--border);display:flex;
-  flex-direction:column;gap:8px}
-.proxy-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;
-  letter-spacing:.05em}
-.proxy-input{height:30px;padding:0 8px;background:var(--bg);
-  border:1px solid var(--border);border-radius:6px;color:var(--text);
-  font-size:11px;font-family:ui-monospace,monospace;outline:none;width:100%}
-.proxy-input:focus{border-color:var(--accent)}
-.footer-btns{display:flex;gap:6px}
-.toggle-btn{flex:1;display:flex;align-items:center;justify-content:center;
-  height:30px;padding:0 8px;border-radius:6px;background:var(--bg);
-  border:1px solid var(--border);color:var(--text-dim);font-size:11px}
-.toggle-btn:hover{background:var(--bg-hover);color:var(--text)}
-.toggle-btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
-.toggle-btn.danger{color:var(--danger)}
-.toggle-btn.danger:hover{background:rgba(231,76,60,.15)}
-
-.main{display:flex;flex-direction:column;min-width:0;position:relative;background:#000}
-.player-stage{position:relative;flex:1;min-height:0;background:#000;overflow:hidden}
-.player-shell{position:absolute;inset:0;display:none;background:#000}
-.player-shell.active{display:block}
-.player-shell video{width:100%;height:100%;object-fit:contain;background:#000;display:block}
-
-.empty-state{position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:12px;color:var(--text-muted);
-  text-align:center;padding:40px}
-.empty-state .icon{font-size:48px;opacity:.6}
-.empty-state h2{font-size:16px;font-weight:600;color:var(--text-dim);margin:0}
-.empty-state p{font-size:13px;margin:0;max-width:320px;line-height:1.5}
-
-.overlay{position:absolute;inset:0;display:none;align-items:center;
-  justify-content:center;flex-direction:column;gap:12px;padding:24px;
-  z-index:15;text-align:center}
-.overlay.active{display:flex}
-.overlay.loading{background:rgba(0,0,0,.8)}
-.overlay.error{background:rgba(20,5,5,.95)}
-.spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.15);
-  border-top-color:var(--accent);border-radius:50%;animation:spin 800ms linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-size:13px;color:var(--text-dim);max-width:420px}
-.loading-stage{font-size:11px;color:var(--text-muted);font-family:ui-monospace,monospace}
-.error-icon{font-size:40px;color:var(--danger)}
-.error-title{font-size:16px;font-weight:600}
-.error-msg{font-size:12px;color:var(--text-dim);max-width:560px;line-height:1.6;
-  font-family:ui-monospace,monospace;word-break:break-word;
-  background:rgba(0,0,0,.4);padding:12px;border-radius:6px;
-  border:1px solid var(--border);text-align:left}
-.error-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.btn{padding:8px 16px;border-radius:var(--radius);background:var(--bg-active);
-  border:1px solid var(--border);color:var(--text);font-size:13px}
-.btn:hover{background:var(--bg-hover)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn.primary:hover{background:var(--accent-hover)}
-
-.debug-panel{position:absolute;right:12px;top:12px;max-width:420px;max-height:50vh;
-  overflow-y:auto;background:rgba(10,10,15,.95);border:1px solid var(--border);
-  border-radius:var(--radius);padding:10px;font-family:ui-monospace,monospace;
-  font-size:10px;color:var(--text-dim);display:none;z-index:25;line-height:1.6;
-  white-space:pre-wrap;word-break:break-all}
-.debug-panel.on{display:block}
-
-.toast-container{position:fixed;top:20px;right:20px;display:flex;
-  flex-direction:column;gap:8px;z-index:1000;pointer-events:none}
-.toast{padding:10px 14px;background:var(--bg-elev);border:1px solid var(--border);
-  border-left:3px solid var(--accent);border-radius:var(--radius);font-size:12px;
-  box-shadow:0 8px 24px rgba(0,0,0,.4);max-width:380px;animation:slideIn .2s ease}
-.toast.error{border-left-color:var(--danger)}
-.toast.success{border-left-color:var(--success)}
-.toast.warn{border-left-color:var(--warning)}
-@keyframes slideIn{from{transform:translateX(20px);opacity:0}
-  to{transform:translateX(0);opacity:1}}
-
-.controls{position:absolute;left:0;right:0;bottom:0;padding:12px 16px 16px;
-  background:linear-gradient(to top,rgba(0,0,0,.95),rgba(0,0,0,.7) 40%,transparent);
-  display:flex;flex-direction:column;gap:8px;opacity:0;transition:opacity .2s;
-  pointer-events:none;z-index:10}
-.player-stage.controls-visible .controls{opacity:1;pointer-events:auto}
-.progress-row{display:flex;align-items:center;gap:10px;height:14px}
-.time-label{font-size:11px;font-variant-numeric:tabular-nums;color:var(--text-dim);
-  min-width:48px;text-align:center}
-.progress-bar{flex:1;height:4px;background:rgba(255,255,255,.18);
-  border-radius:2px;position:relative;cursor:pointer}
-.progress-bar:hover{height:6px}
-.progress-fill{position:absolute;left:0;top:0;bottom:0;background:var(--accent);
-  border-radius:2px;width:0;transition:width .08s linear}
-.progress-buffer{position:absolute;left:0;top:0;bottom:0;
-  background:rgba(255,255,255,.25);border-radius:2px;width:0}
-.controls-row{display:flex;align-items:center;gap:8px}
-.ctrl-btn{width:36px;height:36px;display:flex;align-items:center;
-  justify-content:center;border-radius:var(--radius);transition:background .15s}
-.ctrl-btn:hover{background:rgba(255,255,255,.1)}
-.ctrl-btn.live{width:auto;padding:0 10px;font-size:11px;font-weight:600;
-  color:var(--danger);letter-spacing:.05em}
-.volume-wrap{display:flex;align-items:center;gap:6px}
-.volume-slider{width:0;opacity:0;overflow:hidden;transition:width .2s,opacity .2s;
-  accent-color:var(--accent)}
-.volume-wrap:hover .volume-slider{width:80px;opacity:1}
-.spacer{flex:1}
-.mobile-menu-btn{display:none;position:absolute;top:12px;left:12px;
-  width:36px;height:36px;background:rgba(0,0,0,.6);border-radius:var(--radius);
-  z-index:30;align-items:center;justify-content:center}
-@media(max-width:768px){.mobile-menu-btn{display:flex}}
+  :root{--bg:#0a0a0f;--fg:#e8e8f0;--dim:#8888a0;--accent:#6a5acd;--danger:#e74c3c}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  #app{height:100%;display:flex;flex-direction:column}
+  #bar{display:flex;align-items:center;gap:10px;padding:10px 16px;
+    border-bottom:1px solid #222;font-size:14px;flex-shrink:0}
+  #bar .name{font-weight:600}
+  #bar .id{color:var(--dim);font-size:12px}
+  #bar .live{margin-left:auto;color:var(--danger);font-size:11px;font-weight:700}
+  #wrap{flex:1;position:relative;background:#000;min-height:0}
+  video{width:100%;height:100%;display:block;background:#000}
+  #overlay{position:absolute;inset:0;display:none;flex-direction:column;
+    align-items:center;justify-content:center;gap:14px;padding:24px;
+    text-align:center;background:rgba(0,0,0,.93);z-index:10;overflow-y:auto}
+  #overlay.on{display:flex}
+  #overlay h1{font-size:20px;margin:0}
+  #overlay p{font-size:13px;color:var(--dim);margin:0;max-width:560px;
+    line-height:1.6;word-break:break-word}
+  #overlay code{background:#1a1a24;padding:2px 6px;border-radius:4px;color:#c8c8ff;
+    font-family:ui-monospace,monospace}
+  .btn{padding:9px 16px;border-radius:8px;background:#24243a;color:var(--fg);
+    border:1px solid #333;font-size:13px;cursor:pointer}
+  .btn:hover{background:#2e2e48}
+  #unmute{position:absolute;bottom:16px;left:16px;display:none;z-index:11}
+  #unmute.on{display:block}
+  .spin{width:36px;height:36px;border:3px solid #333;border-top-color:var(--accent);
+    border-radius:50%;animation:sp .8s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-
-<div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-title">
-        <h1 id="app-title">JioTV</h1>
-        <span class="badge" id="channel-count">0</span>
-      </div>
-      <input type="search" id="channel-search" class="search-input" placeholder="Search channels..." />
-    </div>
-    <nav class="channel-list" id="channel-list"></nav>
-    <div class="sidebar-footer">
-      <div>
-        <div class="proxy-label">CORS / Cookie Proxy (required for Jio)</div>
-        <input type="text" id="proxy-input" class="proxy-input"
-               placeholder="https://your-proxy.workers.dev/" />
-      </div>
-      <div class="footer-btns">
-        <button class="toggle-btn" id="refresh-btn">Refresh JSON</button>
-        <button class="toggle-btn" id="debug-btn">Debug</button>
-        <button class="toggle-btn danger" id="reload-btn" title="Reload">↻</button>
-      </div>
-    </div>
-  </aside>
-
-  <main class="main">
-    <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
-
-    <div class="player-stage" id="player-stage">
-      <div class="empty-state" id="empty-state">
-        <div class="icon">▶</div>
-        <h2>Select a channel</h2>
-        <p>Pick from the sidebar, or open a shareable link like <code>/?id=167</code> or <code>/zee-tv-hd</code>.</p>
-      </div>
-
-      <div class="overlay loading" id="loading-overlay">
-        <div class="spinner"></div>
-        <div class="loading-text" id="loading-text">Loading...</div>
-        <div class="loading-stage" id="loading-stage"></div>
-      </div>
-
-      <div class="overlay error" id="error-overlay">
-        <div class="error-icon">⚠</div>
-        <div class="error-title" id="error-title">Playback error</div>
-        <div class="error-msg" id="error-msg"></div>
-        <div class="error-actions">
-          <button class="btn primary" id="error-retry">Retry</button>
-          <button class="btn" id="error-open">Open stream URL</button>
-          <button class="btn" id="error-dismiss">Dismiss</button>
-        </div>
-      </div>
-
-      <div class="debug-panel" id="debug-panel"></div>
-
-      <div class="controls" id="controls">
-        <div class="progress-row">
-          <span class="time-label" id="time-current">--:--</span>
-          <div class="progress-bar" id="progress-bar">
-            <div class="progress-buffer" id="progress-buffer"></div>
-            <div class="progress-fill" id="progress-fill"></div>
-          </div>
-          <span class="time-label" id="time-duration">--:--</span>
-        </div>
-        <div class="controls-row">
-          <button class="ctrl-btn" id="btn-play">▶</button>
-          <div class="volume-wrap">
-            <button class="ctrl-btn" id="btn-mute">🔊</button>
-            <input type="range" min="0" max="1" step="0.01" value="1"
-                   class="volume-slider" id="volume-slider" />
-          </div>
-          <div class="spacer"></div>
-          <button class="ctrl-btn live" id="btn-live" title="Jump to live">● LIVE</button>
-          <button class="ctrl-btn" id="btn-share" title="Copy shareable link">🔗</button>
-          <button class="ctrl-btn" id="btn-pip" title="Picture in picture">⧉</button>
-          <button class="ctrl-btn" id="btn-fullscreen" title="Fullscreen">⛶</button>
-        </div>
-      </div>
-    </div>
-  </main>
+<div id="app">
+  <div id="bar">
+    <span class="name" id="ch-name">—</span>
+    <span class="id" id="ch-id"></span>
+    <span class="live" id="live" style="display:none">● LIVE</span>
+  </div>
+  <div id="wrap">
+    <video id="video" playsinline muted></video>
+    <button class="btn" id="unmute">🔊 Tap to unmute</button>
+    <div id="overlay"><div id="ov-body"></div></div>
+  </div>
 </div>
-
-<div class="toast-container" id="toast-container"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.7.11/dist/shaka-player.compiled.js"></script>
 <script>
 'use strict';
 
-/* ============================================================
+/* ------------------------------------------------------------
    CONFIG
-   ============================================================ */
-const JSON_URL = 'https://msd7-json-mirror.kumarkaran64373.workers.dev/json/jiotv';
-const PROXY_KEY = 'jiotv.proxy.v1';
+   ------------------------------------------------------------ */
+const DATA_URL = 'https://sportlink-tv11.pages.dev/Data.json';
 
-/* ============================================================
-   UTILITIES
-   ============================================================ */
-const $  = (s, r = document) => r.querySelector(s);
-const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+/* Optional proxy. Leave empty for native query-token mode.
+   If Jio returns 403/1001, deploy the Worker proxy and set either:
+     const PROXY = 'https://your-worker.workers.dev/';
+   or open the page with  &proxy=https://your-worker.workers.dev/
+*/
+const PROXY = new URLSearchParams(location.search).get('proxy') || '';
 
-function el(tag, attrs = {}, children = []) {
-  const n = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs)) {
-    if (k === 'class') n.className = v;
-    else if (k === 'html') n.innerHTML = v;
-    else if (k === 'text') n.textContent = v;
-    else if (k.startsWith('on') && typeof v === 'function') n.addEventListener(k.slice(2), v);
-    else if (v != null) n.setAttribute(k, v);
+/* ------------------------------------------------------------
+   HELPERS
+   ------------------------------------------------------------ */
+const $ = (s) => document.querySelector(s);
+const video = $('#video');
+const overlay = $('#overlay');
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+function show(html) { $('#ov-body').innerHTML = html; overlay.classList.add('on'); }
+function hide() { overlay.classList.remove('on'); }
+
+function idNotFound(id, ids) {
+  const sample = ids && ids.length
+    ? `<p>Valid IDs in this JSON: ${ids.slice(0,8).map(x=>`<code>${x}</code>`).join(', ')}.</p>`
+    : '';
+  show(`
+    <h1>ID not found</h1>
+    <p>Open this page with a channel ID, for example <code>/?id=${ids[0]||'162'}</code>.</p>
+    ${id ? `<p>Requested: <code>${escapeHtml(id)}</code></p>` : ''}
+    ${sample}
+  `);
+}
+
+/* ------------------------------------------------------------
+   BOOT
+   ------------------------------------------------------------ */
+(async function main() {
+  const id = new URLSearchParams(location.search).get('id');
+
+  if (!id) {
+    try {
+      const data = await fetchJson();
+      idNotFound('', (data.channels||[]).map(c=>String(c.id)));
+    } catch {
+      idNotFound('', []);
+    }
+    return;
   }
-  for (const c of children) {
-    if (typeof c === 'string') n.appendChild(document.createTextNode(c));
-    else if (c) n.appendChild(c);
+
+  show(`<div class="spin"></div><p>Loading channels…</p>`);
+
+  let data;
+  try {
+    data = await fetchJson();
+  } catch (err) {
+    show(`<h1>Failed to load Data.json</h1><p>${escapeHtml(err.message)}</p>
+      <button class="btn" onclick="location.reload()">Retry</button>`);
+    return;
   }
-  return n;
+
+  const channels = data.channels || [];
+  const ch = channels.find(c => String(c.id) === String(id));
+
+  if (!ch) {
+    idNotFound(id, channels.map(c => String(c.id)));
+    return;
+  }
+
+  if (ch.cookie_expire && Number(ch.cookie_expire) * 1000 < Date.now()) {
+    const when = ch.cookie_expire_ist ||
+      new Date(Number(ch.cookie_expire) * 1000).toISOString();
+    show(`<h1>Token expired</h1>
+      <p>The <code>__hdnea__</code> token for this channel expired at
+      <b>${escapeHtml(when)}</b>.</p>
+      <p>Refresh <code>Data.json</code> at the source, then reload.</p>
+      <button class="btn" onclick="location.reload()">Reload</button>`);
+    return;
+  }
+
+  $('#ch-name').textContent = ch.name || ('Channel ' + id);
+  $('#ch-id').textContent = 'ID ' + ch.id;
+
+  try {
+    await play(ch);
+    hide();
+    $('#live').style.display = '';
+    $('#unmute').classList.add('on');
+  } catch (err) {
+    showPlaybackError(ch, err);
+  }
+})();
+
+async function fetchJson() {
+  const res = await fetch(DATA_URL, { cache: 'no-store' });
+  if (!res.ok) throw new Error('HTTP ' + res.status + ' for ' + DATA_URL);
+  return await res.json();
 }
 
-function fmtTime(s) {
-  if (!isFinite(s) || s < 0) return '--:--';
-  const x = Math.floor(s % 60), m = Math.floor((s / 60) % 60), h = Math.floor(s / 3600);
-  const p = n => String(n).padStart(2, '0');
-  return h > 0 ? `${h}:${p(m)}:${p(x)}` : `${p(m)}:${p(x)}`;
+/* ------------------------------------------------------------
+   PLAYER
+   ------------------------------------------------------------ */
+let shakaPlayer = null;
+
+async function play(ch) {
+  if (typeof shaka === 'undefined') throw new Error('shaka-player CDN failed to load');
+  shaka.polyfill.installAll();
+  if (!shaka.Player.isBrowserSupported()) throw new Error('Browser does not support DASH');
+
+  const token = extractToken(ch);
+  const clearKeys = buildKeys(ch);
+
+  shakaPlayer = new shaka.Player();
+  await shakaPlayer.attach(video);
+  shakaPlayer.addEventListener('error', onShakaError);
+
+  shakaPlayer.configure({
+    drm: {
+      clearKeys,
+      retryParameters: { maxAttempts: 2, baseDelay: 500, timeout: 20000 }
+    },
+    manifest: {
+      retryParameters: { maxAttempts: 3, baseDelay: 500, backoffFactor: 2, timeout: 30000 }
+    },
+    streaming: {
+      retryParameters: { maxAttempts: 3, baseDelay: 500, backoffFactor: 2, timeout: 30000 },
+      bufferingGoal: 30,
+      rebufferingGoal: 2
+    },
+    abr: { enabled: true, defaultBandwidthEstimate: 2000000 }
+  });
+
+  // Append token to manifest AND every segment request.
+  const net = shakaPlayer.getNetworkingEngine();
+  if (net) {
+    net.registerRequestFilter((type, request) => {
+      request.uris = request.uris.map(u => decorate(u, token));
+      if (PROXY && token) request.headers['X-Cookie'] = '__hdnea__=' + token;
+    });
+  }
+
+  await shakaPlayer.load(decorate(ch.stream_url, token));
+
+  const variants = shakaPlayer.getVariantTracks();
+  if (!variants.length) throw new Error('Manifest loaded but no playable tracks found');
+
+  video.muted = true;
+  try { await video.play(); } catch {}
+
+  const btn = $('#unmute');
+  btn.onclick = () => { video.muted = false; btn.classList.remove('on'); };
 }
 
-function toast(msg, kind = '') {
-  const t = el('div', { class: `toast ${kind}`, text: msg });
-  $('#toast-container').appendChild(t);
-  setTimeout(() => {
-    t.style.transition = 'opacity .2s';
-    t.style.opacity = '0';
-    setTimeout(() => t.remove(), 220);
-  }, 4500);
+function extractToken(ch) {
+  const raw = ch.cookie || '';
+  const m = raw.match(/__hdnea__=([^;]+)/);
+  return m ? m[1].trim() : raw.trim();
 }
 
-function slugify(s) {
-  return String(s || '').toLowerCase()
-    .replace(/&/g, ' and ')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 60) || 'channel';
-}
-
-function parseKeys(sportlink, key_id, key) {
+function buildKeys(ch) {
   const out = {};
-  for (const pair of sportlink || []) {
+  for (const pair of ch.sportlink || []) {
     const i = pair.indexOf(':');
     if (i < 0) continue;
-    out[pair.slice(0, i).trim().toLowerCase()] = pair.slice(i + 1).trim().toLowerCase();
+    out[pair.slice(0, i).trim().toLowerCase()] =
+      pair.slice(i + 1).trim().toLowerCase();
   }
-  if (key_id && key && !out[key_id.toLowerCase()]) {
-    out[key_id.toLowerCase()] = key.toLowerCase();
+  if (ch.key_id && ch.key && !out[String(ch.key_id).toLowerCase()]) {
+    out[String(ch.key_id).toLowerCase()] = String(ch.key).toLowerCase();
   }
   return out;
 }
 
-/* ============================================================
-   PROXY  (path-based: http://proxy/ + full URL)
-   Example: http://localhost:8090/https://jiotvpllive.cdn.jio.com/.../index.mpd
-   The proxy reads the X-Cookie header and forwards it as Cookie.
-   ============================================================ */
-const Proxy = {
-  get() { try { return localStorage.getItem(PROXY_KEY) || ''; } catch { return ''; } },
-  set(v) { try { localStorage.setItem(PROXY_KEY, (v || '').trim()); } catch {} },
-  wrap(url) {
-    const p = this.get();
-    if (!p || !url) return url;
-    if (/^(data:|blob:|about:)/i.test(url)) return url;
-    if (url.startsWith(p)) return url;
-    if (!/^https?:\/\//i.test(url)) return url;
-    return p + url;
+function decorate(url, token) {
+  if (!url || /^(data:|blob:|about:)/i.test(url)) return url;
+  let out = url;
+
+  if (token && !/[?&]__hdnea__=/.test(out)) {
+    out += (out.includes('?') ? '&' : '?') + '__hdnea__=' + token;
   }
-};
-
-/* ============================================================
-   STATE
-   ============================================================ */
-const STATE = {
-  channels: {},   // id -> channel object
-  slugs: {},      // slug -> id
-  order: [],      // ids in JSON order
-  meta: {},
-  activeId: null,
-  controllers: new Map(),
-  shells: new Map(),
-  buttons: new Map(),
-  debugOn: false,
-  jsonLoadedAt: 0,
-};
-
-/* ============================================================
-   JSON LOADING / INDEX
-   ============================================================ */
-async function fetchJson() {
-  const res = await fetch(JSON_URL, { cache: 'no-store' });
-  if (!res.ok) throw new Error(`JSON HTTP ${res.status}`);
-  return await res.json();
+  if (PROXY && !out.startsWith(PROXY)) out = PROXY + out;
+  return out;
 }
 
-function buildIndex(data) {
-  const old = STATE.channels;
-  const channels = {};
-  const slugs = {};
-  const order = [];
-  const used = new Set();
-
-  for (const raw of data.channels || []) {
-    const id = String(raw.id);
-    let slug = slugify(raw.name || ('channel-' + id));
-    if (used.has(slug)) slug = slug + '-' + id;
-    used.add(slug);
-
-    const fresh = {
-      ...raw,
-      id,
-      slug,
-      type: /\.m3u8(\?|$)/i.test(raw.stream_url || '') ? 'hls' : 'dash',
-      clearKeys: parseKeys(raw.sportlink, raw.key_id, raw.key),
-    };
-
-    // Preserve object reference if channel already existed
-    if (old[id]) {
-      Object.assign(old[id], fresh);
-      channels[id] = old[id];
-    } else {
-      channels[id] = fresh;
-    }
-    slugs[slug] = id;
-    order.push(id);
-  }
-
-  STATE.channels = channels;
-  STATE.slugs = slugs;
-  STATE.order = order;
-  STATE.meta = {
-    last_updated: data.last_updated || '',
-    telegram: data.telegram || '',
-  };
-  STATE.jsonLoadedAt = Date.now();
+/* ------------------------------------------------------------
+   ERRORS
+   ------------------------------------------------------------ */
+function onShakaError(event) {
+  const err = event.detail || event;
+  showPlaybackError(null, err);
 }
 
-function resolveTarget() {
-  const params = new URLSearchParams(location.search);
-  const q = params.get('id');
-  if (q) {
-    const qs = String(q).trim();
-    if (STATE.channels[qs]) return qs;
-    if (STATE.slugs[qs]) return STATE.slugs[qs];
+function showPlaybackError(ch, err) {
+  const code = err && err.code;
+  const msg = (err && err.message) || String(err);
+  let hint = '';
+
+  if (code === 1001 || code === 6001 || code === 6004 || /403/.test(msg)) {
+    hint = `
+      <p>The CDN refused the request. Two common causes:</p>
+      <p>1. Token expired, or your IP is outside India (JioTV is geo-restricted).<br>
+         2. Browser cannot send a <code>Cookie</code> header. If query-token mode is rejected,
+         add a proxy:<br>
+         <code>/?id=${ch ? ch.id : '162'}&amp;proxy=https://your-worker.workers.dev/</code></p>
+    `;
+  } else if (code === 1002) {
+    hint = '<p>Manifest parse failed — CDN probably returned an HTML error page instead of an MPD.</p>';
+  } else if (code === 1003 || code === 3016) {
+    hint = '<p>DRM keys in <code>Data.json</code> are invalid or expired for this stream.</p>';
   }
-  const path = decodeURIComponent(location.pathname.replace(/^\/+|\/+$/g, ''));
-  if (!path) return null;
-  if (STATE.channels[path]) return path;
-  if (STATE.slugs[path]) return STATE.slugs[path];
-  return null;
+
+  show(`<h1>Playback failed${code ? ' ('+code+')' : ''}</h1>
+    <p>${escapeHtml(msg)}</p>${hint}
+    <button class="btn" onclick="location.reload()">Retry</button>`);
 }
-
-function shareUrlFor(id) {
-  const ch = STATE.channels[id];
-  if (!ch) return location.origin + '/';
-  return location.origin + '/' + ch.slug;
-}
-
-/* ============================================================
-   PLAYER CONTROLLER
-   ============================================================ */
-class PlayerController {
-  constructor(id, app) {
-    this.id = id;
-    this.app = app;
-    this.video = null;
-    this.shell = null;
-    this.shaka = null;
-    this.hls = null;
-    this.initialized = false;
-  }
-
-  get ch() { return STATE.channels[this.id]; }
-
-  buildDom() {
-    this.shell = el('div', { class: 'player-shell', id: `shell-${this.id}` });
-    this.video = el('video', {
-      id: `video-${this.id}`,
-      playsinline: '',
-      controls: 'false',
-      preload: 'auto',
-      crossorigin: 'anonymous',
-    });
-    this.video.muted = true;
-    this.shell.appendChild(this.video);
-    return this.shell;
-  }
-
-  async init() {
-    if (this.initialized) return;
-    const ch = this.ch;
-
-    if (ch.type === 'hls') {
-      await this.initHls();
-    } else {
-      await this.initDash();
-    }
-
-    this.initialized = true;
-    this.video.muted = true;
-    try { await this.video.play(); } catch {}
-  }
-
-  async initDash() {
-    if (typeof shaka === 'undefined') throw new Error('Shaka Player CDN not loaded');
-
-    shaka.polyfill.installAll();
-    if (!shaka.Player.isBrowserSupported()) {
-      throw new Error('Browser does not support DASH playback');
-    }
-
-    this.shaka = new shaka.Player();
-    await this.shaka.attach(this.video);
-    this.shaka.addEventListener('error', (e) => this.onShakaError(e));
-
-    this.shaka.configure({
-      drm: {
-        clearKeys: this.ch.clearKeys,
-        retryParameters: { maxAttempts: 2, baseDelay: 500, timeout: 20000 },
-      },
-      manifest: {
-        retryParameters: { maxAttempts: 3, baseDelay: 500, backoffFactor: 2, timeout: 30000 },
-      },
-      streaming: {
-        retryParameters: { maxAttempts: 3, baseDelay: 500, backoffFactor: 2, timeout: 30000 },
-        bufferingGoal: 30,
-        rebufferingGoal: 2,
-      },
-      abr: { enabled: true, defaultBandwidthEstimate: 2000000 },
-    });
-
-    const net = this.shaka.getNetworkingEngine();
-    if (net) {
-      net.registerRequestFilter((type, request) => {
-        const proxy = Proxy.get();
-        if (proxy) {
-          request.uris = request.uris.map(u => Proxy.wrap(u));
-          // Custom header only when proxy is set
-          if (this.ch.cookie) request.headers['X-Cookie'] = this.ch.cookie;
-        }
-      });
-    }
-
-    const manifestUrl = Proxy.wrap(this.ch.stream_url);
-    await this.shaka.load(manifestUrl);
-
-    const variants = this.shaka.getVariantTracks();
-    if (!variants.length) throw new Error('No playable variants found');
-  }
-
-  async initHls() {
-    await loadHlsJs();
-
-    this.hls = new Hls({
-      enableWorker: true,
-      lowLatencyMode: false,
-      xhrSetup: (xhr) => {
-        if (Proxy.get() && this.ch.cookie) {
-          try { xhr.setRequestHeader('X-Cookie', this.ch.cookie); } catch {}
-        }
-      },
-    });
-
-    this.hls.on(Hls.Events.ERROR, (event, data) => this.onHlsError(data));
-    this.hls.attachMedia(this.video);
-    this.hls.loadSource(Proxy.wrap(this.ch.stream_url));
-  }
-
-  onShakaError(event) {
-    const err = event.detail || event;
-    this.app.debug(`shaka error ${err.code}: ${err.message}`);
-    if (STATE.activeId !== this.id) return;
-    this.app.showError(
-      `Playback error (${err.code || '?'})`,
-      `${err.message || 'unknown'}\n\n${friendlyShaka(err)}`
-    );
-  }
-
-  onHlsError(data) {
-    if (!data.fatal) return;
-    let msg = '';
-    switch (data.type) {
-      case Hls.ErrorTypes.NETWORK_ERROR:
-        msg = 'Network error — manifest/segment blocked or CORS missing.';
-        break;
-      case Hls.ErrorTypes.MEDIA_ERROR:
-        msg = 'Media error — codec or container unsupported.';
-        break;
-      default:
-        msg = `HLS error: ${data.details || data.type}`;
-    }
-    this.app.debug(`hls fatal: ${data.details}`);
-    if (STATE.activeId !== this.id) return;
-    this.app.showError('HLS playback error', msg);
-  }
-
-  async play() {
-    try { await this.video.play(); } catch {}
-  }
-  pause() { if (this.video) this.video.pause(); }
-
-  destroy() {
-    if (this.shaka) { try { this.shaka.destroy(); } catch {} this.shaka = null; }
-    if (this.hls) { try { this.hls.destroy(); } catch {} this.hls = null; }
-    this.initialized = false;
-  }
-}
-
-function friendlyShaka(err) {
-  const c = err && err.code;
-  const m = {
-    1001: 'Network error on manifest/segment fetch — likely CORS or missing Cookie header.',
-    1002: 'Manifest parse error — MPD may be malformed or an HTML error page was returned.',
-    1003: 'DRM/decryption error — clearKeys may be wrong or expired.',
-    3016: 'Content encrypted, no matching key found. Refresh JSON for fresh keys.',
-    6001: 'Segment request failed — CDN is blocking or cookies expired.',
-    6004: 'Segment fetch returned non-200.',
-  };
-  return m[c] ? `Interpretation: ${m[c]}` : `Interpretation: unknown shaka error ${c}.`;
-}
-
-function loadHlsJs() {
-  if (window.Hls) return Promise.resolve();
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js';
-    s.onload = resolve;
-    s.onerror = () => reject(new Error('Failed to load hls.js'));
-    document.head.appendChild(s);
-  });
-}
-
-/* ============================================================
-   APP
-   ============================================================ */
-class App {
-  constructor() {
-    this._cacheDom();
-    this._bindEvents();
-  }
-
-  _cacheDom() {
-    this.$stage = $('#player-stage');
-    this.$list = $('#channel-list');
-    this.$search = $('#channel-search');
-    this.$loading = $('#loading-overlay');
-    this.$loadingTxt = $('#loading-text');
-    this.$loadingStage = $('#loading-stage');
-    this.$error = $('#error-overlay');
-    this.$errorTitle = $('#error-title');
-    this.$errorMsg = $('#error-msg');
-    this.$debug = $('#debug-panel');
-    this.$empty = $('#empty-state');
-    this.$progress = $('#progress-bar');
-    this.$progressFill = $('#progress-fill');
-    this.$progressBuf = $('#progress-buffer');
-    this.$timeCur = $('#time-current');
-    this.$timeDur = $('#time-duration');
-    this.$controls = $('#controls');
-  }
-
-  /* ---------------- Sidebar ---------------- */
-  renderSidebar() {
-    this.$list.innerHTML = '';
-    $('#channel-count').textContent = STATE.order.length;
-    STATE.buttons.clear();
-
-    for (const id of STATE.order) {
-      const ch = STATE.channels[id];
-      const btn = el('button', {
-        class: 'channel-item',
-        id: `chbtn-${id}`,
-        'data-name': (ch.name || '').toLowerCase(),
-        'data-slug': ch.slug,
-      }, [
-        el('img', {
-          class: 'ch-logo',
-          src: ch.logo || '',
-          alt: '',
-          loading: 'lazy',
-          onerror: (e) => { e.target.style.visibility = 'hidden'; },
-        }),
-        el('div', { class: 'ch-info' }, [
-          el('div', { class: 'ch-name', text: ch.name || id }),
-          el('div', { class: 'ch-meta', text: `${ch.type.toUpperCase()} • /${ch.slug}` }),
-        ]),
-        el('span', { class: 'ch-status', title: 'status' }),
-      ]);
-
-      btn.addEventListener('click', () => this.open(id, { push: true }));
-      this.$list.appendChild(btn);
-      STATE.buttons.set(id, btn);
-    }
-  }
-
-  filterSidebar(q) {
-    const query = q.toLowerCase().trim();
-    for (const [id, btn] of STATE.buttons) {
-      const ch = STATE.channels[id];
-      const hay = `${ch.name} ${ch.slug} ${id}`.toLowerCase();
-      btn.style.display = (!query || hay.includes(query)) ? '' : 'none';
-    }
-  }
-
-  setActiveButton(id) {
-    for (const [bid, btn] of STATE.buttons) {
-      btn.classList.toggle('active', bid === id);
-    }
-  }
-
-  setStatus(id, status) {
-    const dot = STATE.buttons.get(id)?.querySelector('.ch-status');
-    if (!dot) return;
-    dot.classList.remove('ok', 'fail', 'testing');
-    if (status) dot.classList.add(status);
-  }
-
-  /* ---------------- Open / close ---------------- */
-  async open(id, { push = false } = {}) {
-    if (!id || !STATE.channels[id]) {
-      this.showEmpty();
-      return;
-    }
-    if (STATE.activeId === id) return;
-
-    // Deactivate previous
-    if (STATE.activeId) {
-      const prev = STATE.controllers.get(STATE.activeId);
-      if (prev) prev.pause();
-      STATE.shells.get(STATE.activeId)?.classList.remove('active');
-    }
-
-    STATE.activeId = id;
-    const ch = STATE.channels[id];
-
-    if (push) {
-      history.pushState({ id }, '', '/' + ch.slug);
-    }
-
-    this.setActiveButton(id);
-    this.$empty.style.display = 'none';
-    this.hideError();
-    this.setLoading(true, `Loading ${ch.name}...`, 'init');
-
-    if (ch.cookie_expire && ch.cookie_expire * 1000 < Date.now()) {
-      toast('Cookie token looks expired — click Refresh JSON', 'warn');
-    }
-
-    // Ensure controller
-    if (!STATE.controllers.has(id)) {
-      const ctrl = new PlayerController(id, this);
-      STATE.controllers.set(id, ctrl);
-      const shell = ctrl.buildDom();
-      this.$stage.insertBefore(shell, this.$stage.firstChild);
-      STATE.shells.set(id, shell);
-      this._wireVideo(id, ctrl);
-    }
-    STATE.shells.get(id).classList.add('active');
-
-    const ctrl = STATE.controllers.get(id);
-    this.setStatus(id, 'testing');
-
-    try {
-      await ctrl.init();
-      this.setLoading(false);
-      await ctrl.play();
-      this.setStatus(id, 'ok');
-      this._updateControls();
-    } catch (err) {
-      this.setLoading(false);
-      this.setStatus(id, 'fail');
-      const msg = err.message || String(err);
-      this.debug(`[${id}] init error: ${msg}`);
-      this.showError('Playback failed', msg + '\n\n' + this._hintFor(ch));
-    }
-  }
-
-  _hintFor(ch) {
-    if (ch.stream_url.includes('jiotvpllive.cdn.jio.com') && !Proxy.get()) {
-      return (
-        'Jio CDN requires the __hdnea__ Cookie header, which browsers cannot set directly.\n' +
-        'Set a proxy in the sidebar. The included Worker proxy forwards X-Cookie → Cookie.\n\n' +
-        'Then click Retry.'
-      );
-    }
-    return '';
-  }
-
-  showEmpty() {
-    if (STATE.activeId) {
-      const prev = STATE.controllers.get(STATE.activeId);
-      if (prev) prev.pause();
-      STATE.shells.get(STATE.activeId)?.classList.remove('active');
-    }
-    STATE.activeId = null;
-    this.setActiveButton(null);
-    this.$empty.style.display = 'flex';
-    this.$controls.style.display = 'none';
-    this.hideError();
-  }
-
-  /* ---------------- Controls ---------------- */
-  _updateControls() {
-    this.$controls.style.display = '';
-    this._syncPlay();
-    this._syncVol();
-    this._syncProgress();
-  }
-
-  _syncPlay() {
-    const ctrl = STATE.controllers.get(STATE.activeId);
-    const v = ctrl && ctrl.video;
-    if (!v) return;
-    $('#btn-play').textContent = (!v.paused && !v.ended) ? '⏸' : '▶';
-  }
-
-  _syncVol() {
-    const ctrl = STATE.controllers.get(STATE.activeId);
-    const v = ctrl && ctrl.video;
-    if (!v) return;
-    $('#btn-mute').textContent = (v.muted || v.volume === 0) ? '🔇' : '🔊';
-    $('#volume-slider').value = v.muted ? 0 : v.volume;
-  }
-
-  _syncProgress() {
-    const ctrl = STATE.controllers.get(STATE.activeId);
-    const v = ctrl && ctrl.video;
-    if (!v) return;
-    const dur = v.duration;
-    const cur = v.currentTime;
-    const isLive = !isFinite(dur) || dur === Infinity;
-
-    this.$timeDur.textContent = isLive ? 'LIVE' : fmtTime(dur);
-    this.$timeCur.textContent = fmtTime(cur);
-    this.$progressFill.style.width = isLive ? '100%' : `${dur > 0 ? (cur / dur) * 100 : 0}%`;
-    this.$btnLive = $('#btn-live');
-    this.$btnLive.style.display = isLive ? '' : 'none';
-
-    try {
-      if (v.buffered.length) {
-        const b = v.buffered.end(v.buffered.length - 1);
-        this.$progressBuf.style.width = isLive ? '100%' : `${Math.min((b / dur) * 100, 100)}%`;
-      }
-    } catch {}
-  }
-
-  _wireVideo(id, ctrl) {
-    const v = ctrl.video;
-    if (!v) return;
-    v.addEventListener('play', () => { if (STATE.activeId === id) this._syncPlay(); });
-    v.addEventListener('pause', () => { if (STATE.activeId === id) this._syncPlay(); });
-    v.addEventListener('timeupdate', () => { if (STATE.activeId === id) this._syncProgress(); });
-    v.addEventListener('progress', () => { if (STATE.activeId === id) this._syncProgress(); });
-    v.addEventListener('volumechange', () => { if (STATE.activeId === id) this._syncVol(); });
-    v.addEventListener('error', () => {
-      if (STATE.activeId !== id) return;
-      const e = v.error;
-      this.showError('Media error', e ? `code ${e.code}: ${e.message}` : 'unknown');
-    });
-  }
-
-  /* ---------------- Overlays ---------------- */
-  setLoading(on, text, stage) {
-    this.$loading.classList.toggle('active', !!on);
-    if (text) this.$loadingTxt.textContent = text;
-    if (stage) this.$loadingStage.textContent = stage;
-  }
-
-  showError(title, msg) {
-    this.$errorTitle.textContent = title || 'Error';
-    this.$errorMsg.textContent = msg || '';
-    this.$error.classList.add('active');
-  }
-  hideError() { this.$error.classList.remove('active'); }
-
-  debug(msg) {
-    if (!STATE.debugOn) return;
-    const t = new Date().toLocaleTimeString();
-    this.$debug.textContent += `[${t}] ${msg}\n`;
-    const lines = this.$debug.textContent.split('\n');
-    if (lines.length > 80) this.$debug.textContent = lines.slice(-80).join('\n');
-    this.$debug.scrollTop = this.$debug.scrollHeight;
-  }
-
-  /* ---------------- Events ---------------- */
-  _bindEvents() {
-    // Search
-    this.$search.addEventListener('input', (e) => this.filterSidebar(e.target.value));
-
-    // Proxy
-    const proxyInput = $('#proxy-input');
-    proxyInput.value = Proxy.get();
-    proxyInput.addEventListener('change', () => {
-      Proxy.set(proxyInput.value);
-      toast('Proxy saved. Re-open channel to apply.', 'success');
-    });
-
-    // Refresh JSON
-    $('#refresh-btn').addEventListener('click', () => this.refreshJson(false));
-    $('#reload-btn').addEventListener('click', () => location.reload());
-
-    // Debug
-    $('#debug-btn').addEventListener('click', () => {
-      STATE.debugOn = !STATE.debugOn;
-      this.$debug.classList.toggle('on', STATE.debugOn);
-      $('#debug-btn').classList.toggle('on', STATE.debugOn);
-    });
-
-    // Controls
-    $('#btn-play').addEventListener('click', () => {
-      const ctrl = STATE.controllers.get(STATE.activeId);
-      const v = ctrl && ctrl.video;
-      if (!v) return;
-      if (v.paused) v.play().catch(() => {}); else v.pause();
-    });
-    $('#btn-mute').addEventListener('click', () => {
-      const ctrl = STATE.controllers.get(STATE.activeId);
-      const v = ctrl && ctrl.video;
-      if (!v) return;
-      v.muted = !v.muted;
-    });
-    $('#volume-slider').addEventListener('input', (e) => {
-      const ctrl = STATE.controllers.get(STATE.activeId);
-      const v = ctrl && ctrl.video;
-      if (!v) return;
-      const val = parseFloat(e.target.value);
-      v.volume = val;
-      v.muted = val === 0;
-    });
-    this.$progress.addEventListener('click', (e) => {
-      const ctrl = STATE.controllers.get(STATE.activeId);
-      const v = ctrl && ctrl.video;
-      if (!v || !isFinite(v.duration)) return;
-      const r = this.$progress.getBoundingClientRect();
-      v.currentTime = ((e.clientX - r.left) / r.width) * v.duration;
-    });
-    $('#btn-live').addEventListener('click', () => {
-      const ctrl = STATE.controllers.get(STATE.activeId);
-      if (!ctrl || !ctrl.shaka) return;
-      try {
-        const sr = ctrl.shaka.seekRange();
-        if (sr && isFinite(sr.end)) ctrl.video.currentTime = sr.end - 0.5;
-      } catch {}
-    });
-    $('#btn-share').addEventListener('click', async () => {
-      if (!STATE.activeId) return;
-      const url = shareUrlFor(STATE.activeId);
-      try {
-        await navigator.clipboard.writeText(url);
-        toast('Link copied: ' + url, 'success');
-      } catch {
-        prompt('Copy this link:', url);
-      }
-    });
-    $('#btn-pip').addEventListener('click', async () => {
-      const ctrl = STATE.controllers.get(STATE.activeId);
-      const v = ctrl && ctrl.video;
-      if (!v) return;
-      try {
-        if (document.pictureInPictureElement) await document.exitPictureInPicture();
-        else await v.requestPictureInPicture();
-      } catch (err) {
-        toast('PiP: ' + err.message, 'error');
-      }
-    });
-    $('#btn-fullscreen').addEventListener('click', () => {
-      if (!document.fullscreenElement) this.$stage.requestFullscreen?.();
-      else document.exitFullscreen?.();
-    });
-
-    // Error buttons
-    $('#error-dismiss').addEventListener('click', () => this.hideError());
-    $('#error-open').addEventListener('click', () => {
-      const ch = STATE.channels[STATE.activeId];
-      if (ch) window.open(ch.stream_url, '_blank', 'noopener');
-    });
-    $('#error-retry').addEventListener('click', () => {
-      this.hideError();
-      const id = STATE.activeId;
-      if (!id) return;
-      const ctrl = STATE.controllers.get(id);
-      if (ctrl) ctrl.destroy();
-      STATE.controllers.delete(id);
-      STATE.shells.get(id)?.remove();
-      STATE.shells.delete(id);
-      STATE.buttons.get(id)?.classList.remove('active');
-      STATE.activeId = null;
-      setTimeout(() => this.open(id, { push: false }), 100);
-    });
-
-    // Auto-hide controls
-    this.$stage.addEventListener('mousemove', () => {
-      this.$stage.classList.add('controls-visible');
-      clearTimeout(this._ctrlTimer);
-      this._ctrlTimer = setTimeout(() => {
-        this.$stage.classList.remove('controls-visible');
-      }, 3000);
-    });
-
-    // Mobile menu
-    $('#mobile-menu-btn').addEventListener('click', () => {
-      $('#sidebar').classList.toggle('open');
-    });
-
-    // Browser back/forward
-    window.addEventListener('popstate', () => {
-      const id = resolveTarget();
-      if (id) this.open(id, { push: false });
-      else this.showEmpty();
-    });
-
-    // Keyboard
-    document.addEventListener('keydown', (e) => {
-      if (e.target.matches('input, textarea')) return;
-      const ctrl = STATE.controllers.get(STATE.activeId);
-      const v = ctrl && ctrl.video;
-      if (e.key === ' ' || e.key === 'k') {
-        if (!v) return;
-        e.preventDefault();
-        if (v.paused) v.play().catch(() => {}); else v.pause();
-      } else if (e.key === 'm' && v) {
-        v.muted = !v.muted;
-      } else if (e.key === 'f') {
-        $('#btn-fullscreen').click();
-      }
-    });
-  }
-
-  /* ---------------- JSON refresh ---------------- */
-  async refreshJson(silent) {
-    try {
-      const data = await fetchJson();
-      buildIndex(data);
-      this.renderSidebar();
-      this.filterSidebar(this.$search.value);
-      if (STATE.activeId && STATE.buttons.get(STATE.activeId)) {
-        this.setActiveButton(STATE.activeId);
-      }
-      if (!silent) toast('Channel list refreshed (' + STATE.order.length + ' channels)', 'success');
-      this.debug('json refreshed: ' + STATE.order.length + ' channels');
-    } catch (err) {
-      if (!silent) toast('Refresh failed: ' + err.message, 'error');
-      this.debug('json refresh failed: ' + err.message);
-    }
-  }
-
-  /* ---------------- Diagnostics ---------------- */
-  async diagnostics() {
-    const proxy = Proxy.get() || '(not set)';
-    const lines = [
-      `JSON: ${JSON_URL}`,
-      `Channels: ${STATE.order.length}`,
-      `Last updated: ${STATE.meta.last_updated || '?'}`,
-      `Proxy: ${proxy}`,
-    ];
-    if (STATE.activeId) {
-      const ch = STATE.channels[STATE.activeId];
-      lines.push(`Active: ${ch.name} (${ch.id})`);
-      lines.push(`Stream: ${ch.stream_url}`);
-      lines.push(`Type: ${ch.type}`);
-      lines.push(`Clear keys: ${Object.keys(ch.clearKeys).length}`);
-      lines.push(`Cookie: ${ch.cookie ? 'present (' + ch.cookie.length + ' chars)' : 'none'}`);
-      if (ch.cookie_expire) {
-        const left = Math.round((ch.cookie_expire * 1000 - Date.now()) / 60000);
-        lines.push(`Cookie expires in: ${left} min`);
-      }
-    }
-    this.debug(lines.join('\n'));
-    alert(lines.join('\n'));
-  }
-}
-
-/* ============================================================
-   BOOT
-   ============================================================ */
-(async function boot() {
-  const app = new App();
-  window.__app = app;
-
-  // Initial loading
-  app.setLoading(true, 'Fetching channel list...', 'json');
-
-  try {
-    const data = await fetchJson();
-    buildIndex(data);
-  } catch (err) {
-    app.setLoading(false);
-    app.showError(
-      'Failed to load channels',
-      `Could not fetch JSON:\n${JSON_URL}\n\n${err.message}\n\n` +
-      'Check the URL, network, or CORS on the Workers endpoint.'
-    );
-    return;
-  }
-
-  app.renderSidebar();
-  app.setLoading(false);
-
-  // Resolve shareable link
-  const target = resolveTarget();
-  if (target) {
-    // Normalise URL to the clean slug form
-    const ch = STATE.channels[target];
-    if (ch) history.replaceState({ id: target }, '', '/' + ch.slug);
-    app.open(target, { push: false });
-  }
-
-  // Auto-refresh JSON every 10 minutes
-  setInterval(() => app.refreshJson(true), 10 * 60 * 1000);
-})();
 </script>
 </body>
 </html>
